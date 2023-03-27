@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:my_schedule/models/class.dart';
-import 'package:my_schedule/new_class.dart';
 
 import 'confs/routes.dart';
 
@@ -42,7 +39,7 @@ class _ListClassesState extends State<ListClasses> {
   Offset _tapPosition = Offset.zero;
   void _getTapPosition(TapDownDetails details) {
     GestureDetector(onTapDown: (details) {
-      final _tapPosition = details.globalPosition;
+      final tapPosition = details.globalPosition;
     });
 
     final RenderBox referenceBox = context.findRenderObject() as RenderBox;
@@ -65,41 +62,54 @@ class _ListClassesState extends State<ListClasses> {
           PopupMenuItem(
             value: 'Favoritar',
             child: myClass.isFav
-                ? Text('Remover dos Favoritos')
-                : Text('Adicionar aos Favoritos'),
+                ? const Text('Remover dos Favoritos')
+                : const Text('Adicionar aos Favoritos'),
           ),
           const PopupMenuItem(
             value: 'Remover',
             child: Text('Remover Cadeira'),
           ),
         ]).then((value) {
-      setState(() {
-        switch (value) {
-          case 'Favoritar':
+      switch (value) {
+        case 'Favoritar':
+          setState(() {
             myClass.isFav = !myClass.isFav;
-            break;
-          case 'Remover':
-            AlertDialog(
-              title: Text('Remover Item'),
-              content: SingleChildScrollView(
-                child: ListBody(
-                  children: <Widget>[
-                    Text(
-                        'Você está prestes a remover a cadeira ${myClass.name}.'),
-                    Text('Deseja continuar?')
+          });
+          break;
+        case 'Remover':
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('Remover Item'),
+                  content: SingleChildScrollView(
+                    child: ListBody(
+                      children: <Widget>[
+                        Text(
+                            'Você está prestes a remover a cadeira ${myClass.name}.'),
+                        const Text('Deseja continuar?')
+                      ],
+                    ),
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                        child: const Text('Continuar'),
+                        onPressed: () {
+                          setState(() {
+                            Navigator.of(context).pop();
+                            classes.remove(myClass);
+                          });
+                        }),
+                    TextButton(
+                        child: const Text('Cancelar'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        })
                   ],
-                ),
-              ),
-              actions: <Widget>[
-                TextButton(
-                    child: const Text('Continuar'),
-                    onPressed: () => classes.remove(myClass)),
-                TextButton(child: const Text('Cancelar'), onPressed: () {})
-              ],
-            );
-            break;
-        }
-      });
+                );
+              });
+          break;
+      }
     });
   }
 
@@ -123,7 +133,7 @@ class _ListClassesState extends State<ListClasses> {
                         }
                       });
                     },
-                    icon: Icon(Icons.add_circle_outline))
+                    icon: const Icon(Icons.add_circle_outline))
               ],
             ),
             body: ListView.separated(
