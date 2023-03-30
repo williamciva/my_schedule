@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:my_schedule/models/class.dart';
+import 'package:my_schedule/services/atitus_api.dart';
 
 import 'confs/routes.dart';
 
@@ -50,7 +52,7 @@ class _ListClassesState extends State<ListClasses> {
 
   void _showMenuOptionTab(MyClass myClass) {
     final RenderObject? overlay =
-        Overlay.of(context).context.findRenderObject();
+        Overlay.of(context)!.context.findRenderObject();
 
     showMenu(
         context: context,
@@ -153,6 +155,10 @@ class _ListClassesState extends State<ListClasses> {
       trailing: Text(myClass.local),
       onLongPress: () => _showMenuOptionTab(myClass),
       onTap: () => setState(() {
+            dotenv.load().then((value) => AtitusApi(host: 'ava.atitus.edu.br')
+                .login(
+                    username: '1127637',
+                    password: '${dotenv.env["PASSWORD"]}'));
             myClass.isFav = !myClass.isFav;
           }));
 }
